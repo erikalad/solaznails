@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Nav from '../../components/Nav';
 
 const CalendarScreen = () => {
   const [selected, setSelected] = useState(''); // Fecha seleccionada
@@ -51,8 +52,7 @@ const CalendarScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Calendario de Citas</Text>
-
+      <Nav name="Turnos"/>
       {/* Calendario */}
       <Calendar
         onDayPress={(day) => setSelected(day.dateString)} // Establecer fecha seleccionada

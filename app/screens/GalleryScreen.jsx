@@ -22,6 +22,7 @@ import img19 from './../../assets/images/fotos/19.webp'
 import img20 from './../../assets/images/fotos/20.webp'
 import img21 from './../../assets/images/fotos/21.webp'
 import img22 from './../../assets/images/fotos/22.webp' 
+import Nav from '../../components/Nav';
 
 const GalleryScreen = () => {
   const images = [
@@ -54,6 +55,7 @@ const GalleryScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+       <Nav name="Mis trabajos"/>
       <FlatList
         data={images}
         renderItem={renderItem}
@@ -68,6 +70,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 10,
+    paddingVertical:20,
     backgroundColor:'#e0f7fa'
   },
   image: {

@@ -8,8 +8,10 @@ import Clientas from "./../../assets/icons/group.svg";
 import Agregar from "./../../assets/icons/anadir.svg";
 import Agendas from "./../../assets/icons/calendario.svg";
 import Galeria from "./../../assets/icons/fotos.svg";
+import { useNavigation } from "expo-router";
 
-const Home = ({ navigation })=> {
+const Home = ()=> {
+  const navigation = useNavigation()
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.nav}>

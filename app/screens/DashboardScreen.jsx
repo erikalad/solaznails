@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Nav from '../../components/Nav';
 
 const DashboardScreen = () => {
   const data = [
@@ -14,7 +15,7 @@ const DashboardScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Dashboard</Text>
+       <Nav name="Dashboard"/>
       <Text style={styles.subtitle}>Clienta más recurrente: Laura (12 visitas)</Text>
       <BarChart
         data={data}

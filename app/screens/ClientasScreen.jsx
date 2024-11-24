@@ -3,6 +3,7 @@ import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
 import { Text, Button, Overlay } from 'react-native-elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Nav from '../../components/Nav';
 
 // Datos de ejemplo
 const clientData = [
@@ -63,7 +64,7 @@ const ClientasScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text h4 style={styles.title}>Lista de Clientas</Text>
+       <Nav name="Lista de Clientas"/>
       <Table>
         <Row data={tableHead} style={styles.head} textStyle={styles.headText}/>
         {

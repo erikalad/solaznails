@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextInput, Button, StyleSheet, Text, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Nav from '../../components/Nav';
 
 const ClientFormScreen = () => {
   // Estados para cada campo
@@ -66,9 +67,8 @@ const ClientFormScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+       <Nav name="Nueva Clienta"/>
       <ScrollView>
-        <Text style={styles.title}>Nueva Clienta</Text>
-
         <Text style={styles.sectionTitle}>1. Datos Personales</Text>
         <TextInput
           style={styles.input}
