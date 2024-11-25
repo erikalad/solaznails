@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { TextInput, Button, StyleSheet, Text, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { TextInput, Button, StyleSheet, Text, ScrollView, TouchableOpacity, View, KeyboardAvoidingView, Platform, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Nav from '../../components/Nav';
+import { useNavigation } from 'expo-router';
 
 const ClientFormScreen = () => {
   // Estados para cada campo
@@ -22,8 +23,24 @@ const ClientFormScreen = () => {
   const [observations, setObservations] = useState('');
   const [clientSatisfaction, setClientSatisfaction] = useState('');
   const [suggestions, setSuggestions] = useState('');
+  const [error, setError] = useState(true)
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false); // Estado para controlar el alerta de éxito
+  const [opacity] = useState(new Animated.Value(1)); // Opacidad para la animación
+  const navigation = useNavigation()
+
 
   const handleSubmit = () => {
+    setShowSuccessAlert(true)
+        // Animar la opacidad para desaparecer lentamente
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 3000, // Duración de 3 segundos para el fade out
+          useNativeDriver: true, // Especificar que se usará el motor nativo para la animación
+        }).start();
+        setTimeout(() => {
+          navigation.navigate('init')
+        },1000); // 30 segundos
+    
     const clientData = {
       name,
       birthdate,
@@ -65,32 +82,48 @@ const ClientFormScreen = () => {
     setSuggestions('');
   };
 
+  useEffect(()=>{
+    if(name && phone){
+      setError(false)
+    }
+  },[name, phone])
+
   return (
     <SafeAreaView style={styles.container}>
        <Nav name="Nueva Clienta"/>
-      <ScrollView>
+       <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={80} // Ajusta esto según tu diseño
+      >
+      <ScrollView
+           showsVerticalScrollIndicator={false}
+           nestedScrollEnabled={true}
+           keyboardShouldPersistTaps="handled"
+           contentContainerStyle={{ flexGrow: 1 }}
+           >
         <Text style={styles.sectionTitle}>1. Datos Personales</Text>
         <TextInput
-          style={styles.input}
-          placeholder="Nombre"
+         style={styles.input}
+          placeholder={ "Nombre *"}
           value={name}
           onChangeText={setName}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
           style={styles.input}
           placeholder="Fecha de nacimiento (DD/MM/AAAA)"
           value={birthdate}
           onChangeText={setBirthdate}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
-          style={styles.input}
-          placeholder="Teléfono"
+         style={styles.input}
+         placeholder={"Teléfono *"}
           value={phone}
           onChangeText={setPhone}
           keyboardType="phone-pad"
-           placeholderTextColor="#a9a9a9"
+          placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
           style={styles.input}
@@ -98,7 +131,7 @@ const ClientFormScreen = () => {
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
 
         <Text style={styles.sectionTitle}>2. Historial de Salud y Uñas</Text>
@@ -107,28 +140,28 @@ const ClientFormScreen = () => {
           placeholder="Alergias conocidas"
           value={allergies}
           onChangeText={setAllergies}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
           style={styles.input}
           placeholder="Condiciones médicas"
           value={medicalConditions}
           onChangeText={setMedicalConditions}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
           style={styles.input}
           placeholder="Estado de las uñas"
           value={nailCondition}
           onChangeText={setNailCondition}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
           style={styles.input}
           placeholder="Tratamientos previos"
           value={previousTreatments}
           onChangeText={setPreviousTreatments}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
 
         <Text style={styles.sectionTitle}>3. Preferencias de la Clienta</Text>
@@ -137,21 +170,21 @@ const ClientFormScreen = () => {
           placeholder="Colores preferidos"
           value={favoriteColors}
           onChangeText={setFavoriteColors}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
           style={styles.input}
           placeholder="Formas de uñas preferidas"
           value={favoriteShapes}
           onChangeText={setFavoriteShapes}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
           style={styles.input}
           placeholder="Frecuencia de visitas"
           value={visitFrequency}
           onChangeText={setVisitFrequency}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
 
         <Text style={styles.sectionTitle}>4. Historial de Servicios</Text>
@@ -160,28 +193,28 @@ const ClientFormScreen = () => {
           placeholder="Última visita (DD/MM/AAAA)"
           value={lastVisit}
           onChangeText={setLastVisit}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
           style={styles.input}
           placeholder="Servicios realizados"
           value={services}
           onChangeText={setServices}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
           style={styles.input}
           placeholder="Productos utilizados"
           value={products}
           onChangeText={setProducts}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
           style={styles.input}
           placeholder="Observaciones"
           value={observations}
           onChangeText={setObservations}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
 
         <Text style={styles.sectionTitle}>5. Comentarios Adicionales</Text>
@@ -190,18 +223,30 @@ const ClientFormScreen = () => {
           placeholder="Satisfacción del cliente"
           value={clientSatisfaction}
           onChangeText={setClientSatisfaction}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
         <TextInput
           style={styles.input}
           placeholder="Sugerencias"
           value={suggestions}
           onChangeText={setSuggestions}
-           placeholderTextColor="#a9a9a9"
+           placeholderTextColor={Platform.OS === 'ios' ? 'grey' : 'black'}
         />
 
-        <Button title="Guardar Clienta" onPress={handleSubmit} />
       </ScrollView>
+      </KeyboardAvoidingView>
+      <TouchableOpacity onPress={error ? console.log('no') : handleSubmit} activeOpacity={error ? 1 : 0.8}>
+         <View style={[styles.boton, error ? styles.error : null]}>
+         <Text style={styles.textbutton}>Guardar</Text>
+         </View>
+        </TouchableOpacity>
+
+          {/* Alert de éxito */}
+      {showSuccessAlert && (
+        <Animated.View style={[styles.successAlert, { opacity }]}>
+          <Text style={styles.successText}>Clienta creada con éxito</Text>
+        </Animated.View>
+       )} 
     </SafeAreaView>
   );
 };
@@ -212,24 +257,66 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f3e5f5',
   },
+  textbutton: {
+    fontSize:16,
+    color: "white",
+     fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
+  },
+  boton: {
+    marginTop:20,
+    backgroundColor: "#d65b88",
+    borderRadius: 10,
+    padding: 20,
+    justifyContent:"center",
+    alignItems:'center'
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 10,
+     fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
   },
   input: {
-    height: 40,
+    height: Platform.OS === 'ios' ? 40 : 50,
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
     borderRadius: 5,
+    fontFamily: 'montserrat'
+  },
+  inputError:{
+    backgroundColor:"#B44B4B1A",
+  },
+  error:{
+    backgroundColor:"#d65b886e"
+  },
+  successAlert: {
+    backgroundColor: "#dff0d8",
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 20,
+    alignItems: "center",
+    position:"absolute",
+    left:'25%'
+  },
+  successText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#3c763d",
+     fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
+  },
+  whatsappLink: {
+    fontSize: 16,
+    color: "#25D366",
+    marginTop: 10,
   },
 });
 

@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
-import frasesMotivadoras from './frases'
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Platform } from 'react-native';
+import React, { useState } from 'react';
+import frasesMotivadoras from './frases';
+import flores from './../assets/images/flores.png';
 
 const Card = () => {
   // Estado para almacenar la frase aleatoria
@@ -13,17 +14,17 @@ const Card = () => {
 
   return (
     <TouchableOpacity onPress={() => setFraseAleatoria(getRandomFrase())}>
-      <View style={styles.container}>
+      <ImageBackground source={flores} style={styles.container}>
         <Text style={styles.frase}>{fraseAleatoria}</Text>
-      </View>
+      </ImageBackground>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    height: 200,
+    height: 150,
     backgroundColor: "white",
     borderRadius: 15,
     padding: 10,
@@ -39,17 +40,20 @@ const styles = StyleSheet.create({
     // Sombra para Android
     elevation: 5,                   // Elevación de la sombra en Android
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  frase: {
+    fontSize: 16,
     color: '#d65b88',
-    marginBottom: 10,
+    textAlign: 'center',
   },
   frase: {
     fontSize: 16,
     color: '#d65b88',
     textAlign: 'center',
-  }
-})
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Fondo semitransparente para que el texto sea legible sobre la imagen
+    padding: 10,
+    borderRadius: 10,
+     fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
+  },
+});
 
 export default Card;

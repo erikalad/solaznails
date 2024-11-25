@@ -9,6 +9,8 @@ import Agregar from "./../../assets/icons/anadir.svg";
 import Agendas from "./../../assets/icons/calendario.svg";
 import Galeria from "./../../assets/icons/fotos.svg";
 import { useNavigation } from "expo-router";
+import DashboardScreen from "./DashboardScreen";
+import CardTurnos from "../../components/CardTurnos";
 
 const Home = ()=> {
   const navigation = useNavigation()
@@ -19,8 +21,19 @@ const Home = ()=> {
         <Image source={logo} style={{ width: 50, height: 50 }} />
       </View>
       <Card />
-      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-        <MiniCard
+      <ScrollView
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled={true}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            nestedScrollEnabled={true}
+            keyboardShouldPersistTaps="handled"
+          >       
+         <MiniCard
           title={"Clientas"}
           icon={<Clientas color={"white"} width={30} height={30} />}
           onPress={() => navigation.navigate('Clientas')}
@@ -40,6 +53,9 @@ const Home = ()=> {
           icon={<Galeria color={"white"} width={30} height={30} />}
           onPress={() => navigation.navigate('Gallery')}
         />
+      </ScrollView>
+      <CardTurnos />
+      <DashboardScreen />
       </ScrollView>
     </SafeAreaView>
   );

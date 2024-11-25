@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native'
 import React from 'react'
 import Back from './../assets/icons/back.svg'
 import { useNavigation } from 'expo-router'
@@ -29,7 +29,8 @@ const styles = StyleSheet.create({
     },
     name:{
       marginHorizontal:20,
-      fontSize:15
+      fontSize:15,
+       fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
     },
     space:{
       width:20,

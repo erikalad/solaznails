@@ -1,4 +1,4 @@
-import { View, Text , StyleSheet, TouchableOpacity} from 'react-native'
+import { View, Text , StyleSheet, TouchableOpacity, Platform} from 'react-native'
 import React from 'react'
 
 const MiniCard = ({title, icon, onPress}) => {
@@ -29,7 +29,8 @@ const styles = StyleSheet.create({
   texto:{
     marginTop:10,
     textAlign:"center",
-    color:"#c61665"
+    color:"#c61665",
+     fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
   }
 })
 
