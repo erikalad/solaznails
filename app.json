@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#ffd858"
-      }
+      },
+      "package": "com.erikalad.solaznails"
     },
     "web": {
       "bundler": "metro",
