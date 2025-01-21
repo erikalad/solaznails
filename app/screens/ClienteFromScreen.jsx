@@ -3,9 +3,12 @@ import { TextInput, Button, StyleSheet, Text, ScrollView, TouchableOpacity, View
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Nav from '../../components/Nav';
 import { useNavigation } from 'expo-router';
+import { useTurnos } from '../../context/TurnosContext';
+import InfoCard from '../../components/InfoCard';
 
 const ClientFormScreen = () => {
   // Estados para cada campo
+  const { agregarClienta, error } = useTurnos(); 
   const [name, setName] = useState('');
   const [birthdate, setBirthdate] = useState('');
   const [phone, setPhone] = useState('');
@@ -23,46 +26,85 @@ const ClientFormScreen = () => {
   const [observations, setObservations] = useState('');
   const [clientSatisfaction, setClientSatisfaction] = useState('');
   const [suggestions, setSuggestions] = useState('');
-  const [error, setError] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [send, setSend] = useState(false)
   const [showSuccessAlert, setShowSuccessAlert] = useState(false); // Estado para controlar el alerta de éxito
-  const [opacity] = useState(new Animated.Value(1)); // Opacidad para la animación
   const navigation = useNavigation()
 
+  console.log(error,showSuccessAlert,loading )
 
-  const handleSubmit = () => {
-    setShowSuccessAlert(true)
-        // Animar la opacidad para desaparecer lentamente
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 3000, // Duración de 3 segundos para el fade out
-          useNativeDriver: true, // Especificar que se usará el motor nativo para la animación
-        }).start();
-        setTimeout(() => {
-          navigation.navigate('init')
-        },1000); // 30 segundos
-    
-    const clientData = {
-      name,
-      birthdate,
-      phone,
-      email,
-      allergies,
-      medicalConditions,
-      nailCondition,
-      previousTreatments,
-      favoriteColors,
-      favoriteShapes,
-      visitFrequency,
-      lastVisit,
-      services,
-      products,
-      observations,
-      clientSatisfaction,
-      suggestions,
+  useEffect(()=>{
+    if(error === null && !showSuccessAlert && !loading && send){
+      navigation.navigate('init');
+    } 
+  },[error,showSuccessAlert ,loading, send])
+
+  const handleSubmit = async () => {
+    setTimeout(() => {
+      if(error === null){
+        setShowSuccessAlert(false)
+      } else{
+        setShowSuccessAlert(false)
+      }
+    }, 2000);
+  
+    // Elimina claves con valores vacíos de forma recursiva
+    const cleanObject = (obj) => {
+      return Object.entries(obj).reduce((acc, [key, value]) => {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          const cleanedChild = cleanObject(value);
+          if (Object.keys(cleanedChild).length > 0) acc[key] = cleanedChild;
+        } else if (value !== undefined && value !== null && value !== '') {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
     };
-    console.log('Datos de la clienta:', clientData);
-
+  
+    const clientData = {
+      nombre: name,
+      fechaNacimiento: birthdate,
+      telefono: phone,
+      email: email,
+      comentarios: {
+        satisfaccion: clientSatisfaction,
+        sugerencias: suggestions,
+      },
+      historial: {
+        ultimaVisita: lastVisit,
+        servicios: services,
+        productos: products,
+        observaciones: observations,
+      },
+      salud: {
+        alergias: allergies,
+        condicionesMedicas: medicalConditions,
+        estadoUnas: nailCondition,
+        tratamientosPrevios: previousTreatments,
+      },
+      preferencias: {
+        colores: favoriteColors,
+        formas: favoriteShapes,
+        frecuencia: visitFrequency,
+      },
+    };
+  
+    const filteredClientData = cleanObject(clientData); // Filtrar datos vacíos
+    console.log('Datos filtrados de la clienta:', filteredClientData);
+  
+    // Llama a la función agregarClienta
+    try {
+      await agregarClienta(filteredClientData); // Llamada al contexto
+      setShowSuccessAlert(true)
+      setSend(true)
+    } catch (error) {
+      console.error('Error al agregar la clienta:', error);
+      setShowSuccessAlert(true)
+      setSend(false)
+    }
+  
     // Resetear los campos
+    if(error === null){
     setName('');
     setBirthdate('');
     setPhone('');
@@ -80,11 +122,12 @@ const ClientFormScreen = () => {
     setObservations('');
     setClientSatisfaction('');
     setSuggestions('');
+    }
   };
-
+  
   useEffect(()=>{
     if(name && phone){
-      setError(false)
+      setLoading(false)
     }
   },[name, phone])
 
@@ -235,17 +278,17 @@ const ClientFormScreen = () => {
 
       </ScrollView>
       </KeyboardAvoidingView>
-      <TouchableOpacity onPress={error ? console.log('no') : handleSubmit} activeOpacity={error ? 1 : 0.8}>
-         <View style={[styles.boton, error ? styles.error : null]}>
+      <TouchableOpacity onPress={loading ? console.log('no') : handleSubmit} activeOpacity={loading ? 1 : 0.8}>
+         <View style={[styles.boton, loading ? styles.error : null]}>
          <Text style={styles.textbutton}>Guardar</Text>
          </View>
         </TouchableOpacity>
 
           {/* Alert de éxito */}
       {showSuccessAlert && (
-        <Animated.View style={[styles.successAlert, { opacity }]}>
-          <Text style={styles.successText}>Clienta creada con éxito</Text>
-        </Animated.View>
+       <View style={[styles.successAlert]}>
+       <InfoCard type={error ? "error" : "success"} text={error ? error : "Clienta creada con éxito"}/>
+       </View>
        )} 
     </SafeAreaView>
   );
@@ -299,13 +342,12 @@ const styles = StyleSheet.create({
     backgroundColor:"#d65b886e"
   },
   successAlert: {
-    backgroundColor: "#dff0d8",
     padding: 15,
     borderRadius: 8,
     marginTop: 20,
     alignItems: "center",
     position:"absolute",
-    left:'25%'
+    left:'50%'
   },
   successText: {
     fontSize: 16,
