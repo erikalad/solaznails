@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "solaznails",
+    "name": "SolazNails",
     "slug": "solaznails",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -14,7 +14,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
-        "backgroundColor": "#ffd858"
+        "backgroundColor": "#fffff"
       },
       "package": "com.erikalad.solaznails"
     },
@@ -31,7 +31,7 @@
           "image": "./assets/images/logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffd858"
+          "backgroundColor": "#fffff"
         }
       ]
     ],

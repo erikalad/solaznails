@@ -15,6 +15,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Nav from "../../components/Nav";
 import { useTurnos } from "./../../context/TurnosContext";
 import DropDownPicker from 'react-native-dropdown-picker';
+import Cancelar from './../../assets/icons/cancelar.svg'
+import Check from './../../assets/icons/check.svg'
 
 
 const CalendarScreen = () => {
@@ -27,10 +29,11 @@ const CalendarScreen = () => {
   const [appointmentTime, setAppointmentTime] = useState(""); // Hora de la cita
   const [showSuccessAlert, setShowSuccessAlert] = useState(false); // Estado para controlar el alerta de éxito
   const [opacity] = useState(new Animated.Value(1)); // Opacidad para la animación
+  const [ changeState,setChangeState ] = useState(false)
   
   useEffect(()=>{
     fetchTurnos()
-  },[showSuccessAlert])
+  },[showSuccessAlert,changeState])
 
   const today = new Date().toISOString().split("T")[0]; // Fecha actual en formato YYYY-MM-DD
 
@@ -73,13 +76,12 @@ const CalendarScreen = () => {
     // Animar la opacidad para desaparecer lentamente
     Animated.timing(opacity, {
       toValue: 0,
-      duration: 3000, // Duración de 3 segundos para el fade out
+      duration: 30000, // Duración de 3 segundos para el fade out
       useNativeDriver: true, // Especificar que se usará el motor nativo para la animación
     }).start();
   
-    // Limpiar campos y cerrar modal
-    setSelectedClient("");
-    setAppointmentTime("");
+    setSelectedClient("")
+    setAppointmentTime("")
     setIsModalVisible(false);
   
     // Ocultar el mensaje después de 30 segundos
@@ -92,12 +94,29 @@ const CalendarScreen = () => {
   const handleSendWhatsApp = async () => {
     try {
       await Share.share({
-        message: `¡Hola ${selectedClient}! Soy Solaz. Tu turno está confirmado para el ${selected} a las ${appointmentTime}.`
+        message: `¡Hola ${selectedClient}! Soy Solaz. Tu turno está confirmado para el ${selected} a las ${appointmentTime} hs.`
       });
     } catch (error) {
       console.error('Error al compartir:', error);
     }
   };
+
+  const deleteTurno = async (turno) => {
+    try {
+      const data = {
+        turnos: [
+          {
+            id_turno: turno.id_turno,
+            cancelado: !turno.cancelado
+        }
+      ]
+      }
+      actualizarClienta(turno.id_clienta, data)
+      setChangeState(true);
+    } catch (error) {
+      console.error('Error al borrar:', error);
+    }
+  }
 
   
   return (
@@ -124,9 +143,21 @@ const CalendarScreen = () => {
             {turnos
               .filter((turno) => turno.fecha === selected)
               .map((turno, index) => (
-                <Text key={index} style={styles.agendaItem}>
+                <View style={styles.containerTurno}>
+                <Text key={index} style={[styles.agendaItem, turno?.cancelado && styles.cancelado]}>
                   - {turno.nombre} a las {turno.hora}
                 </Text>
+                <TouchableOpacity
+                onPress={()=>deleteTurno(turno)}
+                style={ !turno?.cancelado ? styles.eliminar : styles.active}
+              >
+                {!turno?.cancelado ? 
+                <Cancelar width={10} height={10} color={"white"}/>
+                :
+                <Check width={10} height={10} color={"white"}/>
+              }
+                </TouchableOpacity>
+                </View>
               ))}
           </>
         ) : selected ? (
@@ -206,7 +237,7 @@ const CalendarScreen = () => {
 
       {/* Alert de éxito */}
       {showSuccessAlert && (
-        <Animated.View style={[styles.successAlert, { opacity }]}>
+        <Animated.View style={[styles.successAlert, {opacity}]}>
           <Text style={styles.successText}>Turno asignado con éxito</Text>
           <TouchableOpacity onPress={handleSendWhatsApp}>
             <Text style={styles.whatsappLink}>Enviar por WhatsApp</Text>
@@ -317,13 +348,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 20,
     alignItems: "center",
+    height:70,
+    justifyContent:"center",
   },
   successText: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#3c763d",
      fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond',
-     position:"absolute"
   },
   whatsappLink: {
     fontSize: 16,
@@ -335,6 +367,31 @@ const styles = StyleSheet.create({
     marginBottom: 20,
      fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
   },
+  containerTurno:{
+    flexDirection:"row",
+    alignItems:"center",
+    justifyContent:"space-between",
+    width:'90%'
+  },
+  eliminar:{
+    width:20,
+    height:20,
+    backgroundColor:"red",
+    justifyContent:"center",
+    alignItems:"center",
+    borderRadius:10
+  },
+  active:{
+    width:20,
+    height:20,
+    backgroundColor:"green",
+    justifyContent:"center",
+    alignItems:"center",
+    borderRadius:10
+  },
+  cancelado:{
+    textDecorationLine: 'line-through'
+  }
 });
 
 export default CalendarScreen;

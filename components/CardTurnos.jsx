@@ -39,10 +39,10 @@ const CardTurnos = () => {
     }
   };
 
-  // Filtrar los turnos para que solo se muestren los de hoy y mañana
-  const turnosFiltrados = turnos.filter(turno =>
-    turno.fecha === todayString || turno.fecha === tomorrowString
-  );
+// Filtrar los turnos para que solo se muestren los de hoy y mañana y que no estén cancelados
+const turnosFiltrados = turnos.filter(turno =>
+  (turno.fecha === todayString || turno.fecha === tomorrowString) && !turno.cancelado
+);
 
   // Ordenar los turnos por la hora (más temprano a más tarde)
   const turnosOrdenados = turnosFiltrados.sort((a, b) => {
