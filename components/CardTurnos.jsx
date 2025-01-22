@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
-import { useTurnos } from './../context/TurnosContext'
+import { useTurnos } from './../context/TurnosContext';
 
 const CardTurnos = () => {
   const { turnos } = useTurnos();
-  console.log(turnos)
+  console.log(turnos);
 
   // Obtener la fecha actual en formato 'YYYY-MM-DD' (sin hora)
   const today = new Date();
@@ -40,20 +40,30 @@ const CardTurnos = () => {
   };
 
   // Filtrar los turnos para que solo se muestren los de hoy y mañana
-  const turnosFiltrados = turnos.filter(turno => 
+  const turnosFiltrados = turnos.filter(turno =>
     turno.fecha === todayString || turno.fecha === tomorrowString
   );
 
+  // Ordenar los turnos por la hora (más temprano a más tarde)
+  const turnosOrdenados = turnosFiltrados.sort((a, b) => {
+    // Convertir la hora en formato de 24 horas con minutos
+    const horaA = a.hora; // Asegurarse de que la hora tenga formato HH:00
+    const horaB = b.hora;
+
+    // Comparar las horas (convertidas a formato 24hs HH:MM)
+    return new Date(`1970-01-01T${horaA}Z`) - new Date(`1970-01-01T${horaB}Z`);
+  });
+
   return (
     <View style={styles.container}>
-      {turnosFiltrados.length > 0 ? (
-        turnosFiltrados.map((turno) => (
+      {turnosOrdenados.length > 0 ? (
+        turnosOrdenados.map((turno) => (
           <View key={turno.id} style={styles.turnoContainer}>
             <View style={[styles.circle, { backgroundColor: colors[Math.floor(Math.random() * colors.length)] }]} />
             <View style={styles.infoContainer}>
               <Text style={styles.fecha}>{getFechaTexto(turno.fecha)}</Text>
               <Text style={styles.hora}>{turno.hora} hs</Text>
-              <Text style={styles.nombre}>{turno.cliente}</Text>
+              <Text style={styles.nombre}>{turno.nombre}</Text>
             </View>
           </View>
         ))
@@ -91,30 +101,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    textAlign:"center"
+    textAlign: "center"
   },
   fecha: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
-     fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
+    fontFamily: Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond',
   },
   hora: {
     fontSize: 14,
     color: '#666',
-     fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
+    fontFamily: Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond',
   },
   nombre: {
     fontSize: 14,
     color: '#444',
-     fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
+    fontFamily: Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond',
   },
   noTurnos: {
     fontSize: 16,
     fontStyle: 'italic',
     color: '#888',
     textAlign: 'center',
-     fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
+    fontFamily: Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond',
   },
 });
 

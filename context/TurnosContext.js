@@ -84,12 +84,14 @@ const handleError = (error) => {
   // Función para cargar fotos desde el servidor
   const fetchFotos = async () => {
     try {
-      const response = await axios.get(`${baseURL}/fotos`);
+      const response = await axios.get(`${baseURL}/uploads`);
       setFotos(response.data);
+      console.log("estas son las fotos", response.data)
       setError(null); // Limpiar error previo
     } catch (error) {
       const errorMessage = handleError(error);
       setError(errorMessage);
+      console.log("error de fotos", errorMessage)
     }
   };
 
@@ -116,21 +118,29 @@ const handleError = (error) => {
     }
   };
 
-  // Función para actualizar una clienta existente
   const actualizarClienta = async (id, data) => {
     try {
-      const response = await axios.patch(`${baseURL}/clienta/${id}`, data);
+      const response = await axios.patch(`${baseURL}/clienta/${id}`, data, 
+        
+        // headers: {
+        //   'Content-Type': 'multipart/form-data',
+        // },
+      );
+  
       setClientas((prevClientas) =>
         prevClientas.map((clienta) =>
           clienta.id === id ? { ...clienta, ...response.data } : clienta
         )
       );
-      setError(null); // Limpiar error previo
+      setError(null);
     } catch (error) {
       const errorMessage = handleError(error);
       setError(errorMessage);
     }
   };
+  
+  
+
   // Función para eliminar una clienta
   const eliminarClienta = async (id) => {
     try {
@@ -161,10 +171,10 @@ const handleError = (error) => {
 
   // Cargar datos iniciales al montar el componente
   useEffect(() => {
-    // fetchTurnos();
+    fetchTurnos();
     fetchClientas();
-    // fetchVisitas();
-    // fetchFotos();
+    fetchVisitas();
+    //fetchFotos();
   }, []);
 
   // Valores disponibles en el contexto

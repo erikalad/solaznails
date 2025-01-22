@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   Modal,
   TouchableOpacity,
-  Linking,
-  Alert,
   Animated,
   Share,
   Platform,
@@ -17,16 +14,23 @@ import { Calendar } from "react-native-calendars";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Nav from "../../components/Nav";
 import { useTurnos } from "./../../context/TurnosContext";
+import DropDownPicker from 'react-native-dropdown-picker';
+
 
 const CalendarScreen = () => {
+  const { turnos, actualizarClienta, clientas, fetchTurnos } = useTurnos(); // Obtener turnos y función para agregar
   const [selected, setSelected] = useState(""); // Fecha seleccionada
   const [isModalVisible, setIsModalVisible] = useState(false); // Control del modal
-  const [clientName, setClientName] = useState(""); // Nombre de la clienta
+  const [open, setOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [items, setItems] = useState(clientas?.map(clienta => ({ label: clienta.nombre, value: clienta.nombre, id: clienta.id_clienta })));
   const [appointmentTime, setAppointmentTime] = useState(""); // Hora de la cita
   const [showSuccessAlert, setShowSuccessAlert] = useState(false); // Estado para controlar el alerta de éxito
   const [opacity] = useState(new Animated.Value(1)); // Opacidad para la animación
-
-  const { turnos, agregarTurno } = useTurnos(); // Obtener turnos y función para agregar
+  
+  useEffect(()=>{
+    fetchTurnos()
+  },[showSuccessAlert])
 
   const today = new Date().toISOString().split("T")[0]; // Fecha actual en formato YYYY-MM-DD
 
@@ -39,51 +43,63 @@ const CalendarScreen = () => {
     return acc;
   }, {});
 
+  console.log(selectedClient)
+
+
   const handleAddAppointment = () => {
-    if (!clientName || !selected || !appointmentTime) {
+    if (!selectedClient || !selected || !appointmentTime) {
       alert("Por favor completa todos los campos.");
       return;
     }
+    const clientaSeleccionada = clientas.find(clienta => clienta.nombre === selectedClient);
+    const data = {
+      turnos: [
+        {
+        nombre: selectedClient,
+        fecha: selected,
+        hora: `${appointmentTime}:00`,
+        cancelado: false
+      }
+    ]
+    }
 
+    console.log("lo que se manda", clientaSeleccionada.id_clienta,data)
     // Agregar el turno al contexto
-    agregarTurno({
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      fecha: selected,
-      cliente: clientName,
-      hora: appointmentTime,
-    });
-
+    actualizarClienta(clientaSeleccionada.id_clienta,data);
+  
     // Mostrar alerta de éxito
     setShowSuccessAlert(true);
-
+  
     // Animar la opacidad para desaparecer lentamente
     Animated.timing(opacity, {
       toValue: 0,
-      duration: 100000, // Duración de 3 segundos para el fade out
+      duration: 3000, // Duración de 3 segundos para el fade out
       useNativeDriver: true, // Especificar que se usará el motor nativo para la animación
     }).start();
-
+  
     // Limpiar campos y cerrar modal
-    setClientName("");
+    setSelectedClient("");
     setAppointmentTime("");
     setIsModalVisible(false);
-
+  
     // Ocultar el mensaje después de 30 segundos
     setTimeout(() => {
       setShowSuccessAlert(false); // Ocultar el mensaje
-    }, 100000); // 30 segundos
+    }, 30000); // 30 segundos
   };
+
 
   const handleSendWhatsApp = async () => {
     try {
       await Share.share({
-       message: `¡Hola ${clientName}! Soy Solaz. Tu turno está confirmado para el ${selected} a las ${appointmentTime}.`
+        message: `¡Hola ${selectedClient}! Soy Solaz. Tu turno está confirmado para el ${selected} a las ${appointmentTime}.`
       });
     } catch (error) {
       console.error('Error al compartir:', error);
     }
   };
 
+  
   return (
     <SafeAreaView style={styles.container}>
       <Nav name="Turnos" />
@@ -109,7 +125,7 @@ const CalendarScreen = () => {
               .filter((turno) => turno.fecha === selected)
               .map((turno, index) => (
                 <Text key={index} style={styles.agendaItem}>
-                  - {turno.cliente} a las {turno.hora}
+                  - {turno.nombre} a las {turno.hora}
                 </Text>
               ))}
           </>
@@ -148,22 +164,25 @@ const CalendarScreen = () => {
             </Text>
 
             {/* Nombre */}
-            <TextInput
+            <DropDownPicker
+              open={open}
+              value={selectedClient}
+              items={items}
+              setOpen={setOpen}
+              setValue={setSelectedClient}
+              setItems={setItems}
+              placeholder="Selecciona una clienta"
               style={styles.input}
-              placeholder="Nombre de la Clienta"
-              value={clientName}
-              onChangeText={setClientName}
-              placeholderTextColor={"grey"}
             />
 
             {/* Hora */}
             <TextInput
               style={styles.input}
-              placeholder="Hora (ej. 10)"
+              placeholder="Hora (ej. 10:30 o 10:00)"
               value={appointmentTime}
               onChangeText={setAppointmentTime}
               placeholderTextColor={"grey"}
-              keyboardType="numeric"
+              // keyboardType="numeric"
             />
 
             {/* Botones */}
@@ -290,7 +309,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingLeft: 10,
     borderRadius: 5,
-     fontFamily:Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
+    fontFamily: Platform.OS === 'ios' ? 'montserrat' : 'montserrat-blond'
   },
   successAlert: {
     backgroundColor: "#dff0d8",
